@@ -14,7 +14,9 @@ def get_book(book_id: int, db: Session):
     return book
 
 def get_books(db: Session):
-    return db.execute(select(models.Book)).scalars().all()
+    return db.execute(
+        select(models.Book).order_by(models.Book.id)
+    ).scalars().all()
 
 def create_book(book_data: schemas.BookCreate, db: Session):
     book = models.Book(**book_data.dict())
@@ -28,7 +30,7 @@ def create_book(book_data: schemas.BookCreate, db: Session):
 def update_book(book_id: int, book_data: schemas.Book, db: Session):
     if book_id != book_data.id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail='Resource ID in request body does not match the ID in URI.'
         )
 
