@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, FastAPI
+from fastapi import APIRouter, Depends, FastAPI, Response
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
@@ -43,7 +43,7 @@ def get_book(id: int, db: Session = Depends(get_db)):
 def update_book(id: int, data: schemas.Book, db: Session = Depends(get_db)):
     return crud.update_book(id, data, db)
 
-@prefix_router.delete('/books/{id}', status_code=204)
+@prefix_router.delete('/books/{id}', status_code=204, response_class=Response)
 def delete_book(id: int, db: Session = Depends(get_db)):
     crud.delete_book(id, db)
 
