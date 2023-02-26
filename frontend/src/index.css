@@ -1,0 +1,65 @@
+/* Book manager */
+.book-manager {
+    display: flex;
+}
+/* Book manager */
+
+
+/* Book form */
+.book-form {
+    align-self: start;
+    width: 50%;
+    padding: 1.5rem;
+    margin-right: 3rem;
+    border: 2px solid #dee2e6;
+    border-radius: 0.375rem;
+}
+.book-form textarea {
+    min-height: 150px;
+}
+.book-form .button-container {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    column-gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+.book-form .button-container button {
+    flex-shrink: 0;
+}
+/* Book form */
+
+
+/* Book list */
+.book-list {
+    width: 50%;
+}
+.book-list .book {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.book-list .book.active {
+    color: #212529;
+    background-color: #e9ecef;
+    border-color: rgba(0, 0, 0, 0.125);
+}
+.book-list .book-icon {
+    margin-right: 1.5rem;
+    color: grey;
+}
+.book-list .data-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.book-list .book-title {
+    font-size: 1.25rem;
+}
+.book-list .book-author {
+    color: grey;
+}
+.book-list .author-icon {
+    margin-right: 0.5rem;
+}
+/* Book list */
