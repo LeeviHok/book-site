@@ -35,5 +35,13 @@ services:
       timeout: 5s
       retries: 5
 
+  nginx:
+    build:
+      context: .
+      dockerfile: ./backend/nginx/Dockerfile
+    restart: always
+    ports:
+      - "8080:80"
+
 volumes:
   postgres_data:

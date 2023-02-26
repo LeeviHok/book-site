@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 function useBookApi(setValidationError) {
   const [books, setBooks] = useState([]);
-  const API_URL = 'http://localhost:8000/api';
+  const API_URL = 'http://localhost:8080/api';
 
   // Fetch books on first component render
   useEffect(() => {
