@@ -1,6 +1,23 @@
 version: "3.8"
 
 services:
+  api:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      # Secrets are provided here for a convenience
+      PSQL_USER: postgres
+      PSQL_PWD: verysecret
+      PSQL_DB: books
+      PSQL_DOMAIN: db
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:15.2
     restart: always
