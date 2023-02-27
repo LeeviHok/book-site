@@ -10,8 +10,9 @@ models.Base.metadata.create_all(bind=engine)
 API_PREFIX = '/api'
 DOCS_URL = f'{API_PREFIX}/docs'
 REDOC_URL = f'{API_PREFIX}/redoc'
+OPENAPI_URL = f'{API_PREFIX}/openapi.json'
 
-app = FastAPI(docs_url=DOCS_URL, redoc_url=REDOC_URL)
+app = FastAPI(docs_url=DOCS_URL, redoc_url=REDOC_URL, openapi_url=OPENAPI_URL)
 prefix_router = APIRouter(prefix=API_PREFIX)
 
 # Yield database session, which is used as a dependency for API endpoints.
