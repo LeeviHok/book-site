@@ -19,6 +19,7 @@ function useBookManager(crudUtils, clearValidationError) {
 
   function createCb(book) {
     setSelectedBook(book);
+    updateFormData(book);
   }
 
   function deleteCb(book_id) {
