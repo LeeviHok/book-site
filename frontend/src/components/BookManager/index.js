@@ -14,9 +14,7 @@ function BookManager() {
 
   const {
     books,
-    createBook,
-    updateBook,
-    deleteBook,
+    crudUtils,
   } = useBookApi(setValidationError);
 
   const {
@@ -25,7 +23,7 @@ function BookManager() {
     handleBookSelect,
     handleFieldUpdate,
     handleSubmit,
-  } = useBookManager(createBook, updateBook, deleteBook, clearValidationError);
+  } = useBookManager(crudUtils, clearValidationError);
 
   const bookListItems = books.map(book => (
     <BookListItem

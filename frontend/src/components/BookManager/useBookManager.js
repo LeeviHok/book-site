@@ -1,14 +1,37 @@
 import { useState } from 'react';
 
-function useBookManager(
-  createBook, updateBook, deleteBook, clearValidationError
-) {
+function useBookManager(crudUtils, clearValidationError) {
   const [selectedBook, setSelectedBook] = useState(null);
   const [formData, setFormData] = useState({
     'title': '',
     'author': '',
     'description': '',
   });
+
+  const {
+    createBook,
+    updateBook,
+    deleteBook,
+    setCreateCb,
+    setUpdateCb,
+    setDeleteCb,
+  } = crudUtils;
+
+  function createCb(book) {
+    setSelectedBook(book);
+  }
+
+  function deleteCb(book_id) {
+    setSelectedBook(null);
+    updateFormData({
+      'title': '',
+      'author': '',
+      'description': '',
+    });
+  }
+
+  setCreateCb(createCb);
+  setDeleteCb(deleteCb);
 
   // Perform all 'formData' state updates through this function. It ensures
   // that validation errors are cleared for all modified form fields.
@@ -43,12 +66,6 @@ function useBookManager(
     }
     else if (submitAction === 'delete') {
       deleteBook(formData.id);
-      setSelectedBook(null);
-      updateFormData({
-        'title': '',
-        'author': '',
-        'description': '',
-      });
     }
   }
 

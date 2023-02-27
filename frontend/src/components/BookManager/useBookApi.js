@@ -7,6 +7,9 @@ import {
 function useBookApi(setValidationError) {
   const [books, setBooks] = useState([]);
   const API_URL = 'http://localhost:8080/api';
+  let createCb = () => {};
+  let updateCb = () => {};
+  let deleteCb = () => {};
 
   // Fetch books on first component render
   useEffect(() => {
@@ -56,7 +59,11 @@ function useBookApi(setValidationError) {
       'method': 'POST',
       'headers': {'Content-Type': 'application/json'},
       'body': JSON.stringify(book),
-    }).then(() => refreshBooks())
+    })
+      .then(data => {
+        refreshBooks();
+        createCb(data);
+      })
       .catch(e => {
         if (!isClientError(e)) {throw e}
       });
@@ -67,26 +74,53 @@ function useBookApi(setValidationError) {
       'method': 'PUT',
       'headers': {'Content-Type': 'application/json'},
       'body': JSON.stringify(book),
-    }).then(() => refreshBooks())
-    .catch(e => {
-      if (!isClientError(e)) {throw e}
-    });
+    })
+      .then(data => {
+        refreshBooks();
+        updateCb(data);
+      })
+      .catch(e => {
+        if (!isClientError(e)) {throw e}
+      });
   }
 
   function deleteBook(book_id) {
     fetchWithValidation(`${API_URL}/books/${book_id}`, {
       'method': 'DELETE',
-    }).then(() => refreshBooks())
-    .catch(e => {
-      if (!isClientError(e)) {throw e}
-    });
+    })
+      .then(() => {
+        refreshBooks();
+        deleteCb(book_id);
+      })
+      .catch(e => {
+        if (!isClientError(e)) {throw e}
+      });
+  }
+
+  function setCreateCb(callback) {
+    createCb = callback;
+  }
+
+  function setUpdateCb(callback) {
+    updateCb = callback;
+  }
+
+  function setDeleteCb(callback) {
+    deleteCb = callback;
+  }
+
+  const crudUtils = {
+    createBook,
+    updateBook,
+    deleteBook,
+    setCreateCb,
+    setUpdateCb,
+    setDeleteCb,
   }
 
   return ({
     books,
-    createBook,
-    updateBook,
-    deleteBook,
+    crudUtils,
   });
 }
 
