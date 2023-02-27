@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
 
+import {
+  fetchData, isClientError, getFieldErrors, getGenericError
+} from './fetchHelper.js';
+
 function useBookApi(setValidationError) {
   const [books, setBooks] = useState([]);
   const API_URL = 'http://localhost:8080/api';
@@ -10,77 +14,72 @@ function useBookApi(setValidationError) {
   // eslint-disable-next-line
   }, []);
 
-  async function sendRequest(uri, options) {
+  // Fetch data and add possible server-side validation errors to the form
+  async function fetchWithValidation(uri, options) {
     try {
-      const response = await fetch(uri, options);
-      const contentType = response.headers.get('content-type');
-      const isJson = contentType?.includes('application/json');
-      const data = isJson ? await response.json() : null;
+      return await fetchData(uri, options);
+    }
+    catch (e) {
+      // Request was faulty from client side
+      if (isClientError(e)) {
+        const fieldErrors = getFieldErrors(e);
+        const genericError = getGenericError(e);
 
-      // HTTP error occured (4xx - 5xx)
-      if (!response.ok) {
-        // Check for 5xx errors
-        if (500 <= response.status <= 599) {
-          // Handle the error
-        }
-        // Response has error details about form field(s)
-        if (isJson && Array.isArray(data.detail)) {
-          data.detail.forEach(errorDetail => {
-            const field = errorDetail.loc[1];
-            const msg = errorDetail.msg;
+        // Add field validation errors if those exists
+        if (fieldErrors.length !== 0) {
+          fieldErrors.forEach(({field, msg}) => {
             setValidationError(field, msg);
           })
         }
-        // Response has error detail which is not specific to any field
-        else if (isJson) {
+
+        // Handle generic validation error which is not field-specific
+        if (genericError) {
           // Handle the error
         }
-        return {'status': 'http-error'};
       }
 
-      // Successful response
-      return {'status': 'ok', 'data': data};
-    }
-    // Network error occured
-    catch (e) {
-      if (e instanceof TypeError) {
-        return {'status': 'network-error'};
-      }
-      else {
-        throw e;
-      }
+      // Rethrow the error further down the chain
+      throw e;
     }
   }
 
-  // Update books, but skip update if any errors are encountered
   function refreshBooks() {
-    sendRequest(`${API_URL}/books`).then(response => {
-      if(response.status === 'ok') {
-        setBooks(response.data);
-      }
-    });
+    fetchWithValidation(`${API_URL}/books`)
+      .then(data => {setBooks(data)})
+      .catch(e => {
+        if (!isClientError(e)) {throw e}
+      });
   }
 
   function createBook(book) {
-    sendRequest(`${API_URL}/books`, {
+    fetchWithValidation(`${API_URL}/books`, {
       'method': 'POST',
       'headers': {'Content-Type': 'application/json'},
       'body': JSON.stringify(book),
-    }).then(() => refreshBooks());
+    }).then(() => refreshBooks())
+      .catch(e => {
+        if (!isClientError(e)) {throw e}
+      });
   }
 
   function updateBook(book) {
-    sendRequest(`${API_URL}/books/${book.id}`, {
+    fetchWithValidation(`${API_URL}/books/${book.id}`, {
       'method': 'PUT',
       'headers': {'Content-Type': 'application/json'},
       'body': JSON.stringify(book),
-    }).then(() => refreshBooks());
+    }).then(() => refreshBooks())
+    .catch(e => {
+      if (!isClientError(e)) {throw e}
+    });
   }
 
   function deleteBook(book_id) {
-    sendRequest(`${API_URL}/books/${book_id}`, {
+    fetchWithValidation(`${API_URL}/books/${book_id}`, {
       'method': 'DELETE',
-    }).then(() => refreshBooks());
+    }).then(() => refreshBooks())
+    .catch(e => {
+      if (!isClientError(e)) {throw e}
+    });
   }
 
   return ({
